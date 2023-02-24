@@ -22,7 +22,8 @@ export default function handler(
     res.status(200).json({
       answer:e.data.choices[0].text
     })
-  }).catch(() => {
+  }).catch((e) => {
+    console.error(e);
     res.status(500).json({
       error: "OpenAI API Error"
     })

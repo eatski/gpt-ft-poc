@@ -12,7 +12,8 @@ const handler : NextApiHandler = async (req, res) => {
     const query = Query.parse(req.query);
     return askQuestion(query).then(answer => {
         res.status(200).json({answer})
-    }).catch(() => {
+    }).catch((e) => {
+        console.error(e);
         res.status(500).json({error: "OpenAI API Error"})
     })
 }
