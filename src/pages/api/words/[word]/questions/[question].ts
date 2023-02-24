@@ -3,17 +3,14 @@ import type { NextApiHandler } from 'next'
 
 import * as z from "zod"
 
-const RequestBody = z.object({
-    prompt: z.string(),
-    debugMode: z.boolean()
+const Query = z.object({
+    word: z.string(),
+    question: z.string()
 })
 
 const handler : NextApiHandler = async (req, res) => {
-    if(!(typeof req.query.story === "string")){
-        throw new Error("Invalid query")
-    };
-    const body = RequestBody.parse(JSON.parse(req.body));
-    return askQuestion(req.query.story, body).then(answer => {
+    const query = Query.parse(req.query);
+    return askQuestion(query).then(answer => {
         res.status(200).json({answer})
     }).catch(() => {
         res.status(500).json({error: "OpenAI API Error"})
