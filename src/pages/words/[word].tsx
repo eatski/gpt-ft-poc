@@ -1,5 +1,6 @@
 import { decrypt } from "@/lib/crypto";
 import { GetServerSideProps } from "next"
+import Link from "next/link";
 
 import * as z from "zod"
 
@@ -29,7 +30,7 @@ export default function Home(props: Props) {
             </p>
         </main>
         <footer>
-            <a href="/">Home</a>
+            <Link href="/">Home</Link>
         </footer>
     </>
 }
