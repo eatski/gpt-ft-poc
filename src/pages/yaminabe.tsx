@@ -1,6 +1,7 @@
 import { FoodReport, foodReportSchema, Personas,personasSchema } from "@/usecases/schema";
 import { useEffect, useState } from "react";
-import { RequestBody } from "./api/yaminabe/food-reporting";
+import { RequestBody as RequestBodyFoodReporting } from "./api/yaminabe/food-reporting";
+import { RequestBody as RequestBodyImage } from "./api/yaminabe/image";
 
 
 export default function Home() {
@@ -18,14 +19,15 @@ export default function Home() {
     },[])
 
     const [reportResult,setReportResult] = useState<FoodReport | null>()
+    const [imgUrl,setImgUrl] = useState<string | null>(null)
     const submitToFoodReportingApi = (items: string[]) => {
-        const body : RequestBody = {
+        const reportBody : RequestBodyFoodReporting = {
             ingredients: items,
             personas: personas || []
         }
         fetch("/api/yaminabe/food-reporting",{
             method: "POST",
-            body: JSON.stringify(body)
+            body: JSON.stringify(reportBody)
         }).then(res => {
             if(res.ok){
                 return res.json()
@@ -34,8 +36,22 @@ export default function Home() {
             }
         }).then(e => {
             const reports = foodReportSchema.parse(e);
-            console.log(e);
             setReportResult(reports);
+        })
+        const imageBody : RequestBodyImage = {
+            ingredients: items,
+        }
+        fetch("/api/yaminabe/image", {
+            method: "POST",
+            body: JSON.stringify(imageBody)
+        }).then(res => {
+            if(res.ok){
+                return res.text()
+            } else {
+                throw new Error("error")
+            }
+        }).then(e => {
+            setImgUrl(e);
         })
     }
     return (
@@ -56,6 +72,9 @@ export default function Home() {
             <code>
                 {reportResult ? JSON.stringify(reportResult) : "no result"}
             </code>
+            {
+                imgUrl ? <img src={imgUrl} /> : null
+            }
         </main>
     )
 }
