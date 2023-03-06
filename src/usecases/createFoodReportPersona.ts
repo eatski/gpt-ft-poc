@@ -27,16 +27,21 @@ export const createPersonas = async (): Promise<Personas> => {
 
     const prompt = createPrompt();
     
-    return openai.createCompletion({
-        model: "text-davinci-003",
-        prompt,
+    return openai.createChatCompletion({
+        model: "gpt-3.5-turbo",
+        messages: [
+            {
+                role: "user",
+                content: prompt
+            }
+        ],
         temperature:0.9,
         top_p: 1,
-        max_tokens: 2048,
+        max_tokens: 4096 - prompt.length,
         frequency_penalty: 0.2,
         presence_penalty: 0.0,
-    }).then(e => { 
-        const text = e.data.choices[0].text
+    }).then(e => {
+        const text = e.data.choices[0].message?.content
         if(text){
             try {
                 return personasSchema.parse(JSON.parse(text));
