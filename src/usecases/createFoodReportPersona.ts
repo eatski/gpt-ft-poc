@@ -1,37 +1,29 @@
 import { openai } from "@/lib/openapi";
-import * as z from "zod"
+
 import zodToJsonSchema from "zod-to-json-schema";
+import { Personas, personasSchema } from "./schema";
 
-const schema = z.array(z.object({
-    name: z.string(),
-    title: z.string(),
-    age: z.number(),
-    persona: z.string().min(15)
-}))
-
-export type Personas = z.infer<typeof schema>;
-
-const jsonSchema = zodToJsonSchema(schema);
+const jsonSchema = zodToJsonSchema(personasSchema);
 
 const createPrompt = () => {
     return `
-# 命令書
-あなたは食レポ番組を企画してます。
-食レポをしてもらう10人の様々な趣味嗜好を持ったペルソナを出力してください。
+# Order
+You are planning a food reportage program.
+Please output a persona of 3 people with various interests and tastes who will be food reporters.
 
-# 出力フォーマット
-以下のスキーマに沿ったJSON
+# Output Format
+JSON according to the following schema
 
 ${JSON.stringify(jsonSchema)}
 
-# 言語
+# Language
 日本語
 
-# 出力
+# Output
 `
 }
 
-export const createFoodReportPersona = async (): Promise<Personas> => {
+export const createPersonas = async (): Promise<Personas> => {
 
     const prompt = createPrompt();
     
@@ -41,13 +33,13 @@ export const createFoodReportPersona = async (): Promise<Personas> => {
         temperature:0.9,
         top_p: 1,
         max_tokens: 2048,
-        frequency_penalty: 0.1,
+        frequency_penalty: 0.2,
         presence_penalty: 0.0,
     }).then(e => { 
         const text = e.data.choices[0].text
         if(text){
             try {
-                return schema.parse(JSON.parse(text));
+                return personasSchema.parse(JSON.parse(text));
             } catch(e){
                 console.error(e);
                 console.log("output",text);
