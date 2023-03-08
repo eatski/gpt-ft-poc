@@ -13,6 +13,9 @@ export const createFoodImage = async (
     size: "1024x1024",
     prompt: createPrompt(ingredients),
     response_format: "url"
+  }).catch(e => {
+    console.error(e.data);
+    throw new Error("OpenAI API Error")
   })
   if(!res.data.data[0].url){
     throw new Error("OpenAI API Error")
