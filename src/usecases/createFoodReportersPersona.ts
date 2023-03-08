@@ -9,7 +9,7 @@ const createPrompt = (titles: StringArray) => {
     return `
 # Order
 You are planning a food reportage program.
-Output detailed personas based on the entered titles and their names for the number of people.
+Output detailed personas based on the entered titles for the number of people.
 
 # Input
 ${JSON.stringify(titles)}

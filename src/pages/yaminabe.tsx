@@ -60,8 +60,7 @@ export default function Home() {
             {
                 personas ? personas.map(persona => {
                     return (
-                        <section key={persona.name}>
-                            <h2>{persona.name}</h2>
+                        <section>
                             <p>{persona.title}</p>
                             <p>{persona.persona}</p>
                         </section>

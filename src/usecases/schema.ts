@@ -1,7 +1,6 @@
 import * as z from "zod"
 
 export const personaSchema = z.object({
-    name: z.string(),
     title: z.string(),
     persona: z.string().min(10)
 })
