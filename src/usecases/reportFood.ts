@@ -1,20 +1,20 @@
 import { openai } from "@/lib/openapi";
 
 import zodToJsonSchema from "zod-to-json-schema";
-import { FoodReport, foodReportSchema, Personas } from "./schema";
+import { FoodReport, foodReportSchema, Persona } from "./schema";
 
 const jsonSchema = zodToJsonSchema(foodReportSchema);
 
-const createPrompt = (ingredients: string[],personas: Personas) => {
+const createPrompt = (ingredients: string[],personas: Persona) => {
     return `
 # Background
 This is a food reporting program.
-The following members will report.
+The following member will report.
 
 ${JSON.stringify(personas)}
 
 # Order
-Assuming that you ate the following cooking, output a food report for the number of people who ate it, with a score from 0 to 100 and the reason why.
+Assuming that the member ate the following cooking, output a food report, with a score from 0 to 100 and the reason why.
 
 # Cooking
 ${ingredients.join(",")} in a cooking pot.
@@ -29,16 +29,15 @@ ${JSON.stringify(jsonSchema)}
 # Language
 日本語
 
-# Output
+# Output JSON
 `
 }
 
 
-export const reportFoodByPersonas = async (ingredients: string[],personas: Personas): Promise<FoodReport> => {
+export const reportFoodByPersona = async (ingredients: string[],persona: Persona): Promise<FoodReport> => {
 
-    const prompt = createPrompt(ingredients,personas);
+    const prompt = createPrompt(ingredients,persona);
     console.log(prompt);
-    
     
     return openai.createChatCompletion({
         model: "gpt-3.5-turbo",
@@ -67,7 +66,7 @@ export const reportFoodByPersonas = async (ingredients: string[],personas: Perso
             throw new Error("OpenAI API Error")
         }
     }).catch(e => {
-        console.error(e.response.data);
+        console.error(e.data);
         throw new Error("OpenAI API Error")
     })
 }

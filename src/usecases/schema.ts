@@ -15,12 +15,10 @@ export const personaWithIdSchema = z.object({
 
 export type Personas = z.infer<typeof personasSchema>;
 
-export const foodReportSchema = z.array(z.object({
-    personaId: z.string(),
-    personaTitle: z.string(),
+export const foodReportSchema = z.object({
     score: z.number().min(0).max(100),
     reason: z.string().min(15)
-}))
+})
 
 export type FoodReport = z.infer<typeof foodReportSchema>;
 

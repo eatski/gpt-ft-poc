@@ -1,29 +1,29 @@
-import { FoodReport, foodReportSchema, Personas,personasSchema } from "@/usecases/schema";
+import { FoodReport, foodReportSchema, Persona, Personas,personaSchema,personasSchema } from "@/usecases/schema";
 import { useEffect, useState } from "react";
 import { RequestBody as RequestBodyFoodReporting } from "./api/yaminabe/food-reporting";
 import { RequestBody as RequestBodyImage } from "./api/yaminabe/image";
 
 
 export default function Home() {
-    const [personas,setPersonas] = useState<Personas | null>(null)
+    const [persona,setPersonas] = useState<Persona | null>(null)
     useEffect(() => {
-        fetch("/api/yaminabe/personas").then(res => {
+        fetch("/api/yaminabe/persona").then(res => {
             if(res.ok){
                 return res.json()
             } else {
                 throw new Error("error")
             }
         }).then(res => {
-            setPersonas(personasSchema.parse(res));
+            setPersonas(personaSchema.parse(res));
         })
     },[])
 
     const [reportResult,setReportResult] = useState<FoodReport | null>()
     const [imgUrl,setImgUrl] = useState<string | null>(null)
-    const submitToFoodReportingApi = (items: string[]) => {
+    const submitToFoodReportingApi = (items: string[],persona: Persona) => {
         const reportBody : RequestBodyFoodReporting = {
             ingredients: items,
-            personas: personas || []
+            persona
         }
         fetch("/api/yaminabe/food-reporting",{
             method: "POST",
@@ -58,16 +58,14 @@ export default function Home() {
         <main>
             <h1>Hello World</h1>
             {
-                personas ? personas.map(persona => {
-                    return (
-                        <section>
-                            <h2>{persona.title}</h2>
-                            <p>{persona.persona}</p>
-                        </section>
-                    )
-                }) : "loading..."
+                persona ? (
+                    <section>
+                        <h2>{persona.title}</h2>
+                        <p>{persona.persona}</p>
+                        <AddToPot submit={(items) => submitToFoodReportingApi(items,persona)}></AddToPot>
+                    </section>
+                ) : "loading..."
             }
-            <AddToPot submit={submitToFoodReportingApi}></AddToPot>
             <code>
                 {reportResult ? JSON.stringify(reportResult) : "no result"}
             </code>
