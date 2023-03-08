@@ -1,11 +1,18 @@
 import * as z from "zod"
 
-export const personasSchema = z.array(z.object({
-    personaId: z.string(),
+export const personaSchema = z.object({
     name: z.string(),
     title: z.string(),
     persona: z.string().min(10)
-}))
+})
+
+export type Persona = z.infer<typeof personaSchema>;
+
+export const personasSchema = z.array(personaSchema)
+
+export const personaWithIdSchema = z.object({
+    personaId: z.string(),
+}).merge(personaSchema)
 
 export type Personas = z.infer<typeof personasSchema>;
 
