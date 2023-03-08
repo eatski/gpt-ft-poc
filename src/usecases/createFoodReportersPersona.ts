@@ -1,15 +1,18 @@
 import { openai } from "@/lib/openapi";
 
 import zodToJsonSchema from "zod-to-json-schema";
-import { Personas, personasSchema } from "./schema";
+import { Personas, personasSchema, StringArray } from "./schema";
 
 const jsonSchema = zodToJsonSchema(personasSchema);
 
-const createPrompt = () => {
+const createPrompt = (titles: StringArray) => {
     return `
 # Order
 You are planning a food reportage program.
-Please output a persona of 3 people with various interests and tastes who will be food reporters.
+Output detailed personas based on the entered titles and their names for the number of people.
+
+# Input
+${JSON.stringify(titles)}
 
 # Output Format
 JSON according to the following schema
@@ -23,9 +26,9 @@ ${JSON.stringify(jsonSchema)}
 `
 }
 
-export const createPersonas = async (): Promise<Personas> => {
+export const createPersonas = async (titles: StringArray): Promise<Personas> => {
 
-    const prompt = createPrompt();
+    const prompt = createPrompt(titles);
     
     return openai.createChatCompletion({
         model: "gpt-3.5-turbo",
