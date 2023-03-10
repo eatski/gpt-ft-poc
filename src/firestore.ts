@@ -1,5 +1,5 @@
 import { initializeApp } from "@firebase/app";
-import { initializeFirestore } from "@firebase/firestore";
+import { collection, doc, initializeFirestore } from "@firebase/firestore";
 
 const app = initializeApp({
     apiKey: "AIzaSyBsmGnSryVAEWoUgLjMQ1IjMWVZq2x3hkk",
@@ -11,4 +11,6 @@ const app = initializeApp({
   measurementId: "G-7X6FHRGW5J"
 });
 
-export const store = initializeFirestore(app,{});
+const store = initializeFirestore(app,{});
+
+export const db = doc(store, "/yaminabe/v1");
