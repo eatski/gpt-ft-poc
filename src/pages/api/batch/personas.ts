@@ -9,7 +9,11 @@ export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse<Personas | string>
 ) {
-    if(req.method !== "GET" ){
+    if(process.env.NODE_ENV === "production"){
+        res.status(404).send("Not Found");
+        return;
+    }
+    if(req.method !== "POSt" ){
         res.status(405).send("Method Not Allowed");
     } else {
         const titles = await createPersonasTitle();
