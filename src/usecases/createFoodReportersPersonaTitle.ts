@@ -8,7 +8,7 @@ const jsonSchema = zodToJsonSchema(zodSchema);
 type Personas = z.infer<typeof zodSchema>;
 
 const createPrompt = () => {
-    return `
+  return `
 # Order
 You are planning a food reportage program.
 Please output 20 personas with eccentric tastes and preferences regarding food.
@@ -26,34 +26,36 @@ ${JSON.stringify(jsonSchema)}
 日本語
 
 # Output
-`
-}
+`;
+};
 
 export const createPersonasTitle = async (): Promise<Personas> => {
+  const prompt = createPrompt();
 
-    const prompt = createPrompt();
-    
-    return openai.createChatCompletion({
-        model: "gpt-3.5-turbo",
-        messages: [
-            {
-                role: "assistant",
-                content: prompt
-            }
-        ],
-        temperature:0.9,
-        top_p: 1,
-        n: 5,
-        max_tokens: 4096 - prompt.length,
-        frequency_penalty: 0.2,
-        presence_penalty: 0.0,
-    }).then(e => {
-        try {
-            return  e.data.choices.flatMap(e => e.message?.content ? zodSchema.parse(JSON.parse((e.message.content))) : []);
-        } catch(e){
-            console.error(e);
-            throw new Error("Parser Error")
-        } 
+  return openai
+    .createChatCompletion({
+      model: "gpt-3.5-turbo",
+      messages: [
+        {
+          role: "assistant",
+          content: prompt,
+        },
+      ],
+      temperature: 0.9,
+      top_p: 1,
+      n: 5,
+      max_tokens: 4096 - prompt.length,
+      frequency_penalty: 0.2,
+      presence_penalty: 0.0,
     })
-}
-    
+    .then((e) => {
+      try {
+        return e.data.choices.flatMap((e) =>
+          e.message?.content ? zodSchema.parse(JSON.parse(e.message.content)) : [],
+        );
+      } catch (e) {
+        console.error(e);
+        throw new Error("Parser Error");
+      }
+    });
+};

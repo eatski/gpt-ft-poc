@@ -1,28 +1,29 @@
-import * as z from "zod"
+import * as z from "zod";
 
 export const personaSchema = z.object({
-    title: z.string(),
-    persona: z.string().min(10)
-})
+  title: z.string(),
+  persona: z.string().min(10),
+});
 
 export type Persona = z.infer<typeof personaSchema>;
 
-export const personasSchema = z.array(personaSchema)
+export const personasSchema = z.array(personaSchema);
 
-export const personaWithIdSchema = z.object({
+export const personaWithIdSchema = z
+  .object({
     personaId: z.string(),
-}).merge(personaSchema)
+  })
+  .merge(personaSchema);
 
 export type Personas = z.infer<typeof personasSchema>;
 
 export const foodReportSchema = z.object({
-    score: z.number().min(0).max(100),
-    reason: z.string().min(15)
-})
+  score: z.number().min(0).max(100),
+  reason: z.string().min(15),
+});
 
 export type FoodReport = z.infer<typeof foodReportSchema>;
 
 export const stringArraySchema = z.array(z.string());
 
 export type StringArray = z.infer<typeof stringArraySchema>;
-
