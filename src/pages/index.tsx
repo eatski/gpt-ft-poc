@@ -1,7 +1,7 @@
 import { db } from "@/firestore"
-import { addDoc, collection, doc, setDoc } from "@firebase/firestore"
+import { collection, doc, setDoc } from "@firebase/firestore"
 import { useRouter } from "next/router";
-import { useState } from "react";
+import React,{ useState } from "react";
 
 export default function Home() {
     const router = useRouter();

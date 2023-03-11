@@ -1,7 +1,7 @@
-import { db, store } from "@/firestore"
+import { store } from "@/firestore"
 import { personasCollection, PersonasDocument, playerCollection, PlayerDocument } from "@/models/store"
 import { doc, onSnapshot,runTransaction, DocumentReference, getDocs, getDoc} from "@firebase/firestore"
-import { useEffect, useMemo, useState } from "react"
+import React,{ useEffect, useMemo, useState } from "react"
 
 type RoomFetchState = {
     status: "loading"| "error" | "notFound"
@@ -16,7 +16,7 @@ export const Prepare = (props:{roomId: string}) => {
         status: "loading"
     });
     const playerId = "testes"
-    const playerDocumentRef = useMemo(() => doc(playerCollection(props.roomId),playerId),[db,props.roomId,playerId]);
+    const playerDocumentRef = useMemo(() => doc(playerCollection(props.roomId),playerId),[props.roomId, playerId]);
     useEffect(() => {
         return onSnapshot(playerDocumentRef, (snapshot) => {
             const exists = snapshot.exists();
@@ -36,7 +36,7 @@ export const Prepare = (props:{roomId: string}) => {
                 status: "error"
             })
         })
-    },[])
+    },[playerDocumentRef])
     switch (state.status) {
         case "loading":
             return <div>loading</div>

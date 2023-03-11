@@ -8,7 +8,7 @@ const openai = new OpenAIApi(configuration);
 
 export default function handler(
   _: never,
-  res: NextApiResponse<any>
+  res: NextApiResponse<string>
 ) {
   openai.createCompletion({
     model: "text-davinci-003",
@@ -19,13 +19,14 @@ export default function handler(
     presence_penalty: 0.0,
     stop: ["\n"],
   }).then(e => {
-    res.status(200).json({
-      answer:e.data.choices[0].text
-    })
+    const text = e.data.choices[0].text;
+    if(text){
+      res.status(200).send(text)
+    } else {
+      res.status(500).send( "OpenAI API Error")
+    }
   }).catch((e) => {
     console.error(e);
-    res.status(500).json({
-      error: "OpenAI API Error"
-    })
+    res.status(500).send( "OpenAI API Error")
   })
 }

@@ -1,5 +1,5 @@
 import { FoodReport, foodReportSchema, Persona,personaSchema } from "@/models/schema";
-import { useEffect, useState } from "react";
+import React,{ useEffect, useState } from "react";
 import { RequestBody as RequestBodyFoodReporting } from "./api/yaminabe/food-reporting";
 import { RequestBody as RequestBodyImage } from "./api/yaminabe/image";
 

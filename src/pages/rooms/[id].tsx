@@ -1,5 +1,6 @@
 import { Prepare } from "@/features/prepare";
 import { useRouter } from "next/router";
+import React from "react";
 
 export default function Yaminabe() {
     const router = useRouter();
