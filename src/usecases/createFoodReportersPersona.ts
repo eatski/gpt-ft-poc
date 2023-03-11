@@ -1,7 +1,7 @@
 import { openai } from "@/lib/openapi";
 
 import zodToJsonSchema from "zod-to-json-schema";
-import { Personas, personasSchema, StringArray } from "./schema";
+import { Personas, personasSchema, StringArray } from "../models/schema";
 
 const jsonSchema = zodToJsonSchema(personasSchema);
 

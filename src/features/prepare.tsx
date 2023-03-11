@@ -1,5 +1,5 @@
 import { db, store } from "@/firestore"
-import { personaSchema } from "@/usecases/schema"
+import { personaSchema } from "@/models/schema"
 import { doc, DocumentData, onSnapshot,runTransaction, DocumentReference } from "@firebase/firestore"
 import { useEffect, useMemo, useState } from "react"
 import z from "zod"

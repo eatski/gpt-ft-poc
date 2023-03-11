@@ -1,7 +1,7 @@
 import { openai } from "@/lib/openapi";
 
 import zodToJsonSchema from "zod-to-json-schema";
-import { FoodReport, foodReportSchema, Persona } from "./schema";
+import { FoodReport, foodReportSchema, Persona } from "../models/schema";
 
 const jsonSchema = zodToJsonSchema(foodReportSchema);
 

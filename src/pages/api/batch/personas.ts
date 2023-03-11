@@ -1,9 +1,10 @@
 // Next.js API route support: https://nextjs.org/docs/api-routes/introduction
 import { createPersonas } from '@/usecases/createFoodReportersPersona';
 import { createPersonasTitle } from '@/usecases/createFoodReportersPersonaTitle';
-import { Personas } from '@/usecases/schema';
+import { Personas } from '@/models/schema';
 import { writeFile } from 'fs/promises';
 import type { NextApiRequest, NextApiResponse } from 'next'
+import { savePersonas } from '@/usecases/personaStore';
 
 export default async function handler(
   req: NextApiRequest,
@@ -13,7 +14,7 @@ export default async function handler(
         res.status(404).send("Not Found");
         return;
     }
-    if(req.method !== "POSt" ){
+    if(req.method !== "POST" ){
         res.status(405).send("Method Not Allowed");
     } else {
         const titles = await createPersonasTitle();
@@ -30,7 +31,7 @@ export default async function handler(
             }
         })
         const personas = result.flatMap(e => e.status === "fulfilled" ? e.value : []);
-        await writeFile("data/persona.json", JSON.stringify(personas), "utf-8");
+        await savePersonas(personas);
         res.status(200).json(personas)
     }
 }

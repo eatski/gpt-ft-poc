@@ -1,6 +1,6 @@
 // Next.js API route support: https://nextjs.org/docs/api-routes/introduction
 import { reportFoodByPersona } from '@/usecases/reportFood';
-import { FoodReport, personaSchema } from '@/usecases/schema';
+import { FoodReport, personaSchema } from '@/models/schema';
 import type { NextApiRequest, NextApiResponse } from 'next'
 import z from "zod"
 
