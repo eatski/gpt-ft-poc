@@ -1,31 +1,24 @@
 import { db, store } from "@/firestore"
-import { personaSchema } from "@/models/schema"
-import { doc, DocumentData, onSnapshot,runTransaction, DocumentReference } from "@firebase/firestore"
+import { personasCollection, PersonasDocument, playerCollection, PlayerDocument } from "@/models/store"
+import { doc, onSnapshot,runTransaction, DocumentReference, getDocs, getDoc} from "@firebase/firestore"
 import { useEffect, useMemo, useState } from "react"
-import z from "zod"
 
 type RoomFetchState = {
     status: "loading"| "error" | "notFound"
 } | {
     status: "success",
-    data: DocumentData | undefined
+    data: PlayerDocument
 }
 
-const dataSchema = z.union([z.object({
-    persona: z.union([personaSchema,z.undefined()]),
-    name: z.union([z.string(),z.undefined()]),
-}),z.undefined()])
-
-type Data = z.infer<typeof dataSchema>
 
 export const Prepare = (props:{roomId: string}) => {
     const [state,setState] = useState<RoomFetchState>({
         status: "loading"
     });
     const playerId = "testes"
-    const player = useMemo(() => doc(db,`/rooms/${props.roomId}/players/${playerId}`),[db,props.roomId,playerId]);
+    const playerDocumentRef = useMemo(() => doc(playerCollection(props.roomId),playerId),[db,props.roomId,playerId]);
     useEffect(() => {
-        return onSnapshot(player, (snapshot) => {
+        return onSnapshot(playerDocumentRef, (snapshot) => {
             const exists = snapshot.exists();
             if(!exists){
                 setState({
@@ -52,42 +45,67 @@ export const Prepare = (props:{roomId: string}) => {
         case "notFound":
             return <div>not found</div>
         case "success":
-            const typedData = dataSchema.parse(state.data);
-            return <Succsess data={typedData} roomId={props.roomId} playerRef={player}></Succsess>
+            return <Succsess player={state.data} playerRef={playerDocumentRef}></Succsess>
     }
 }
 
-const Succsess = (props: {data:Data,roomId: string,playerRef: DocumentReference<DocumentData>}) => {
+const Succsess = ({player,playerRef}: {player:PlayerDocument,playerRef: DocumentReference<PlayerDocument>}) => {
+    const [persona,setPersona] = useState<{
+        status: "ready" | "error"
+    } | {
+        status: "done",
+        data: PersonasDocument
+    }>({
+        status: "ready"
+    });
     useEffect(() => {
-        fetch("/api/yaminabe/persona").then(res => {
-            if(res.ok){
-                return res.json()
-            } else {
-                throw new Error("error")
-            }
-        }).then((res) => {
-            const persona = personaSchema.parse(res);
+        if(persona.status !== "ready"){
+            return;
+        }
+        if(player.personaId){
+            const personaRef = doc(personasCollection,player.personaId);
+            getDoc(personaRef)
+                .then(e => {
+                    const data = e.data();
+                    if(data){
+                        setPersona({
+                            status: "done",
+                            data
+                        })
+                    } else {
+                        console.error("persona not found")
+                        setPersona({
+                            status: "error"
+                        })
+                    }
+                })
+            return;
+        }
+       getDocs(personasCollection)
+        .then(({docs}) => {
+            return docs[Math.floor(Math.random() * docs.length)].id;
+        })
+        .then(personaId => {
             runTransaction(store,async (t) => {
-                const current = await t.get(props.playerRef);
+                const current = await t.get(playerRef);
                 const data = current.data();
-                const typed = dataSchema.safeParse(data);
-                if(!typed.success || typed.data?.persona === undefined){
-                    t.set<Data>(props.playerRef,{
+                if(data?.personaId === undefined){
+                    t.set(playerRef,{
                         name: "仮の名前",
-                        persona
+                        personaId
                     })
                 }
             });
         })
-    })
+    },[persona,player.personaId,playerRef])
     return <div>
-        <h2>{props.data?.name || "準備中"}</h2>
+        <h2>{player?.name || "準備中"}</h2>
         {
-            props.data?.persona && <dl>
+            persona.status === "done" && <dl>
                 <dt>肩書き</dt>
-                <dd>{props.data.persona.title}</dd>
+                <dd>{persona.data.title}</dd>
                 <dt>自己紹介</dt>
-                <dd>{props.data.persona.persona}</dd>
+                <dd>{persona.data.persona}</dd>
             </dl>
         }
     </div>

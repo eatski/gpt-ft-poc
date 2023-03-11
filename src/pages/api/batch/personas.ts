@@ -2,9 +2,10 @@
 import { createPersonas } from '@/usecases/createFoodReportersPersona';
 import { createPersonasTitle } from '@/usecases/createFoodReportersPersonaTitle';
 import { Personas } from '@/models/schema';
-import { writeFile } from 'fs/promises';
 import type { NextApiRequest, NextApiResponse } from 'next'
-import { savePersonas } from '@/usecases/personaStore';
+import { doc,writeBatch} from '@firebase/firestore';
+import { personasCollection } from '@/models/store';
+import { store } from '@/firestore';
 
 export default async function handler(
   req: NextApiRequest,
@@ -31,7 +32,11 @@ export default async function handler(
             }
         })
         const personas = result.flatMap(e => e.status === "fulfilled" ? e.value : []);
-        await savePersonas(personas);
+        const batch = writeBatch(store);
+        personas.forEach(persona => {
+            batch.set(doc(personasCollection),persona);
+        })
+        await batch.commit();
         res.status(200).json(personas)
     }
 }
