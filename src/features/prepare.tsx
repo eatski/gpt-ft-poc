@@ -12,12 +12,17 @@ type RoomFetchState =
       data: PlayerDocument;
     };
 
-export const Prepare = (props: { roomId: string }) => {
+export type PrepareProps = {
+  roomId: string;
+  onReady: () => void;
+};
+
+export const Prepare = ({ roomId, onReady }: PrepareProps) => {
   const [state, setState] = useState<RoomFetchState>({
     status: "loading",
   });
   const playerId = "testes";
-  const playerDocumentRef = useMemo(() => doc(playerCollection(props.roomId), playerId), [props.roomId, playerId]);
+  const playerDocumentRef = useMemo(() => doc(playerCollection(roomId), playerId), [roomId, playerId]);
   useEffect(() => {
     return onSnapshot(
       playerDocumentRef,
@@ -50,16 +55,18 @@ export const Prepare = (props: { roomId: string }) => {
     case "notFound":
       return <div>not found</div>;
     case "success":
-      return <Succsess player={state.data} playerRef={playerDocumentRef}></Succsess>;
+      return <Succsess player={state.data} playerRef={playerDocumentRef} onReady={onReady}></Succsess>;
   }
 };
 
 const Succsess = ({
   player,
   playerRef,
+  onReady,
 }: {
   player: PlayerDocument;
   playerRef: DocumentReference<PlayerDocument>;
+  onReady: () => void;
 }) => {
   const [persona, setPersona] = useState<
     | {
@@ -115,12 +122,15 @@ const Succsess = ({
     <div>
       <h2>{player?.name || "準備中"}</h2>
       {persona.status === "done" && (
-        <dl>
-          <dt>肩書き</dt>
-          <dd>{persona.data.title}</dd>
-          <dt>自己紹介</dt>
-          <dd>{persona.data.persona}</dd>
-        </dl>
+        <>
+          <dl>
+            <dt>肩書き</dt>
+            <dd>{persona.data.title}</dd>
+            <dt>自己紹介</dt>
+            <dd>{persona.data.persona}</dd>
+          </dl>
+          <button onClick={onReady}>準備完了</button>
+        </>
       )}
     </div>
   );
