@@ -1,6 +1,6 @@
 // Next.js API route support: https://nextjs.org/docs/api-routes/introduction
-import { createFoodImage } from "@/usecases/createFoodImage";
-import { translateToEn } from "@/usecases/translateToEn";
+import { createFoodImage } from "@/usecases/openai/createFoodImage";
+import { translateToEn } from "@/usecases/openai/translateToEn";
 import type { NextApiRequest, NextApiResponse } from "next";
 import z from "zod";
 

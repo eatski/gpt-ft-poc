@@ -1,6 +1,6 @@
 // Next.js API route support: https://nextjs.org/docs/api-routes/introduction
-import { createPersonas } from "@/usecases/createFoodReportersPersona";
-import { createPersonasTitle } from "@/usecases/createFoodReportersPersonaTitle";
+import { createPersonas } from "@/usecases/openai/createFoodReportersPersona";
+import { createPersonasTitle } from "@/usecases/openai/createFoodReportersPersonaTitle";
 import { Personas } from "@/models/schema";
 import type { NextApiRequest, NextApiResponse } from "next";
 import { doc, writeBatch } from "@firebase/firestore";
