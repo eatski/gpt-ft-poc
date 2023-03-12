@@ -10,7 +10,6 @@ export type PrepareProps = {
 };
 
 export const Prepare = ({ roomId, onReady }: PrepareProps) => {
-
   const playerId = "testes";
   const playerDocumentRef = useMemo(() => doc(playerCollection(roomId), playerId), [roomId, playerId]);
   const playerDocumentData = useSubscribeDocument(playerDocumentRef);

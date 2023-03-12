@@ -18,7 +18,7 @@ export default function Home() {
             const room = doc(rooms);
             const player = doc(room, "/players/testes");
             setLoading(true);
-            await Promise.all([setDoc(player, {}),setDoc(room, { phase: "prepare" })]);
+            await Promise.all([setDoc(player, {}), setDoc(room, { phase: "prepare" })]);
             router.push(`/rooms/${room.id}`);
           }}
         >
