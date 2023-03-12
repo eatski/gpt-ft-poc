@@ -1,8 +1,10 @@
 import { Prepare } from "./prepare";
 import React, { useMemo } from "react";
 import { useSubscribeDocument } from "@/util/firestore-hooks";
-import { doc, setDoc } from "@firebase/firestore";
-import { roomCollection, RoomDocument } from "@/models/store";
+import { doc, writeBatch } from "@firebase/firestore";
+import { potsCollection, roomCollection, RoomDocument } from "@/models/store";
+import { store } from "@/lib/firestore";
+import { Game } from "./game";
 
 export type RoomProps = {
   roomId: string;
@@ -30,13 +32,21 @@ const Success: React.FC<{ roomDocumentData: RoomDocument; roomId: string }> = ({
         <Prepare
           roomId={roomId}
           onReady={() => {
-            setDoc(doc(roomCollection, roomId), {
+            const batch = writeBatch(store);
+            [1, 2, 3].forEach(() => {
+              const potsCollectionRef = potsCollection(roomId);
+              batch.set(doc(potsCollectionRef), {
+                status: "ok",
+              });
+            });
+            batch.set(doc(roomCollection, roomId), {
               phase: "game",
             });
+            batch.commit();
           }}
         ></Prepare>
       );
     case "game":
-      return <div>game</div>;
+      return <Game roomId={roomId} />;
   }
 };

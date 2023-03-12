@@ -15,7 +15,7 @@ export default function Home() {
         <button
           onClick={async () => {
             const room = doc(roomCollection);
-            const player = doc(playerCollection(room.id),"testes");
+            const player = doc(playerCollection(room.id), "testes");
             setLoading(true);
             await Promise.all([setDoc(player, {}), setDoc(room, { phase: "prepare" })]);
             router.push(`/rooms/${room.id}`);

@@ -43,3 +43,23 @@ export type RoomDocument = z.infer<typeof roomDocumentSchema>;
 export const roomCollection = collection(db, `/rooms/`).withConverter<RoomDocument>(
   new ZodSchemaConverter(roomDocumentSchema),
 );
+
+export const potDocumentSchema = z.object({
+  status: z.literal("ok"),
+});
+
+export type PotDocument = z.infer<typeof potDocumentSchema>;
+
+export const potsCollection = (roomId: string) =>
+  collection(db, `/rooms/${roomId}/pots`).withConverter<PotDocument>(new ZodSchemaConverter(potDocumentSchema));
+
+export const potsActionsDocumentSchema = z.object({
+  action: z.literal("init"),
+});
+
+export type PotsActionsDocument = z.infer<typeof potsActionsDocumentSchema>;
+
+export const potsActionsCollection = (roomId: string, potId: string) =>
+  collection(db, `/rooms/${roomId}/pots/${potId}/actions`).withConverter<PotsActionsDocument>(
+    new ZodSchemaConverter(potsActionsDocumentSchema),
+  );
