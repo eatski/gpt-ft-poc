@@ -1,5 +1,5 @@
-import { db } from "@/lib/firestore";
-import { collection, doc, setDoc } from "@firebase/firestore";
+import { playerCollection, roomCollection } from "@/models/store";
+import { doc, setDoc } from "@firebase/firestore";
 import { useRouter } from "next/router";
 import React, { useState } from "react";
 
@@ -14,9 +14,8 @@ export default function Home() {
       ) : (
         <button
           onClick={async () => {
-            const rooms = collection(db, "/rooms");
-            const room = doc(rooms);
-            const player = doc(room, "/players/testes");
+            const room = doc(roomCollection);
+            const player = doc(playerCollection(room.id),"testes");
             setLoading(true);
             await Promise.all([setDoc(player, {}), setDoc(room, { phase: "prepare" })]);
             router.push(`/rooms/${room.id}`);
