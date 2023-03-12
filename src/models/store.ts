@@ -1,6 +1,6 @@
 import { collection, QueryDocumentSnapshot, SnapshotOptions } from "@firebase/firestore";
 import { z } from "zod";
-import { db } from "../firestore";
+import { db } from "../lib/firestore";
 import { personaSchema } from "./schema";
 
 export type PersonasDocument = z.infer<typeof personaSchema>;

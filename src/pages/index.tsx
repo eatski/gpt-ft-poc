@@ -1,4 +1,4 @@
-import { db } from "@/firestore";
+import { db } from "@/lib/firestore";
 import { collection, doc, setDoc } from "@firebase/firestore";
 import { useRouter } from "next/router";
 import React, { useState } from "react";

@@ -1,4 +1,4 @@
-import { store } from "@/firestore";
+import { store } from "@/lib/firestore";
 import { personasCollection, PersonasDocument, playerCollection, PlayerDocument } from "@/models/store";
 import { useSubscribeDocument } from "@/util/firestore-hooks";
 import { doc, runTransaction, DocumentReference, getDocs, getDoc } from "@firebase/firestore";

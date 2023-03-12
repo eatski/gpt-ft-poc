@@ -5,7 +5,7 @@ import { Personas } from "@/models/schema";
 import type { NextApiRequest, NextApiResponse } from "next";
 import { doc, writeBatch } from "@firebase/firestore";
 import { personasCollection } from "@/models/store";
-import { store } from "@/firestore";
+import { store } from "@/lib/firestore";
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse<Personas | string>) {
   if (process.env.NODE_ENV === "production") {
