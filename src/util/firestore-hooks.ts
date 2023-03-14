@@ -1,4 +1,4 @@
-import { CollectionReference, DocumentReference, onSnapshot, QuerySnapshot } from "@firebase/firestore";
+import { DocumentReference, onSnapshot, Query, QuerySnapshot } from "@firebase/firestore";
 import { useEffect, useState } from "react";
 
 type SubscriptionData<T> =
@@ -39,7 +39,7 @@ export const useSubscribeDocument = <T>(documentRef: DocumentReference<T>) => {
   return document;
 };
 
-export const useSubscribeCollection = <T>(collectionRef: CollectionReference<T>) => {
+export const useSubscribeCollection = <T>(collectionRef: Query<T>) => {
   const [collection, setCollection] = useState<SubscriptionData<QuerySnapshot<T>>>({
     status: "loading",
   });

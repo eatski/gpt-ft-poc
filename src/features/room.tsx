@@ -2,7 +2,7 @@ import { Prepare } from "./prepare";
 import React, { useMemo } from "react";
 import { useSubscribeDocument } from "@/util/firestore-hooks";
 import { doc, writeBatch } from "@firebase/firestore";
-import { potsCollection, roomCollection, RoomDocument } from "@/models/store";
+import { roomActionsCollection, roomCollection, RoomDocument } from "@/models/store";
 import { store } from "@/lib/firestore";
 import { Game } from "./game";
 
@@ -33,12 +33,23 @@ const Success: React.FC<{ roomDocumentData: RoomDocument; roomId: string }> = ({
           roomId={roomId}
           onReady={() => {
             const batch = writeBatch(store);
-            [1, 2, 3].forEach(() => {
-              const potsCollectionRef = potsCollection(roomId);
-              batch.set(doc(potsCollectionRef), {
-                status: "ok",
+            const ref = roomActionsCollection(roomId);
+              batch.set(doc(ref), {
+                type: "INIT_POTS",
+                payload: {
+                  pots: [
+                    {
+                      id: "A",
+                    },
+                    {
+                      id: "B",
+                    },
+                    {
+                      id: "C",
+                    }
+                  ]
+                }
               });
-            });
             batch.set(doc(roomCollection, roomId), {
               phase: "game",
             });
