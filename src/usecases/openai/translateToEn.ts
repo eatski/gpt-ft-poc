@@ -1,9 +1,17 @@
 import { openai } from "@/lib/openapi";
 import * as z from "zod";
+import zodToJsonSchema from "zod-to-json-schema";
 
-const wordsSchema = z.array(z.string());
+type Words = string[]
 
-type Words = z.infer<typeof wordsSchema>;
+const zodSchema = z.array(z.object({
+  original: z.string(),
+  translated: z.string(),
+}));
+
+type Translation = z.infer<typeof zodSchema>;
+
+const jsonSchema = zodToJsonSchema(zodSchema);
 
 const createPrompt = (words: Words) => {
   return `
@@ -14,13 +22,15 @@ Translate Input into English
 ${JSON.stringify(words)}
 
 # Output Format
-JSON Array of String
+Only JSON according to the following schema
+
+${JSON.stringify(jsonSchema)}
 
 # Output
 `;
 };
 
-export const translateToEn = async (words: Words): Promise<Words> => {
+export const translateToEn = async (words: Words): Promise<Translation> => {
   const prompt = createPrompt(words);
 
   const res = await openai.createChatCompletion({
@@ -36,5 +46,11 @@ export const translateToEn = async (words: Words): Promise<Words> => {
   if (!text) {
     throw new Error("OpenAI API Error");
   }
-  return wordsSchema.parse(JSON.parse(text));
+  try {
+    return zodSchema.parse(JSON.parse(text));
+  } catch (e) {
+    console.log("output",text)
+    console.error(e);
+    throw new Error("Parser Error");
+  }
 };

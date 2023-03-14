@@ -82,3 +82,12 @@ export const roomActionsCollection = (roomId: string) =>
   );
 
 export const roomActionsQueryBase = (roomId: string) => query(roomActionsCollection(roomId), orderBy("timestamp"));
+
+export const translationDocumentSchema = z.object({
+  ja: z.string(),
+  en: z.string(),
+})
+
+export type TranslationDocument = z.infer<typeof translationDocumentSchema>;
+
+export const translationCollection = (roomId: string) => collection(db, `/rooms/${roomId}/translations`).withConverter<TranslationDocument>(new ZodSchemaConverter(translationDocumentSchema))

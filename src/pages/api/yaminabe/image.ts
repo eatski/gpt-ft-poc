@@ -1,6 +1,5 @@
 // Next.js API route support: https://nextjs.org/docs/api-routes/introduction
 import { createFoodImage } from "@/usecases/openai/createFoodImage";
-import { translateToEn } from "@/usecases/openai/translateToEn";
 import type { NextApiRequest, NextApiResponse } from "next";
 import z from "zod";
 
@@ -15,8 +14,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse<
     res.status(405).send("Method Not Allowed");
   } else {
     const body = requestBodySchema.parse(JSON.parse(req.body));
-    const ingredientsEn = await translateToEn(body.ingredients);
-    const image = await createFoodImage(ingredientsEn);
+    const image = await createFoodImage(body.ingredients);
     res.status(200).send(image);
   }
 }
