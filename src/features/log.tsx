@@ -1,11 +1,15 @@
 import { roomActionsCollection, RoomActionsDocument } from "@/models/store";
 import { useSubscribeCollection } from "@/util/firestore-hooks";
-import { QuerySnapshot } from "@firebase/firestore";
+import { orderBy, query, QuerySnapshot } from "@firebase/firestore";
 import React, {useMemo} from "react";
 import { match, P } from 'ts-pattern';
 
 export const Log: React.FC<{roomId: string}> = ({roomId}) => {
-    const col = useMemo(() => roomActionsCollection(roomId), [roomId]);
+    const col = useMemo(() => 
+        query(roomActionsCollection(roomId),
+        orderBy("timestamp"),),
+    [roomId]
+    );
     const ingredientsGroupSubscription = useSubscribeCollection(col);
     switch (ingredientsGroupSubscription.status) {
         case "error":

@@ -51,13 +51,15 @@ export const roomActionsDocumentSchema = z.union([
       pots: z.array(z.object({
         id: z.string(),
       }))
-    })  
+    }),
+    timestamp: z.number(),
   }), z.object({
     type: z.literal("PUT_INGREDIENT"),
     payload: z.object({
       potId: z.string(),
       ingredient: z.string()
-    })
+    }),
+    timestamp: z.number(),
   })]
 )
 

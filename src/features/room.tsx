@@ -48,7 +48,8 @@ const Success: React.FC<{ roomDocumentData: RoomDocument; roomId: string }> = ({
                       id: "C",
                     }
                   ]
-                }
+                },
+                timestamp: new Date().getTime()
               });
             batch.set(doc(roomCollection, roomId), {
               phase: "game",
