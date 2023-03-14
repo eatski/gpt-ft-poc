@@ -34,23 +34,23 @@ const Success: React.FC<{ roomDocumentData: RoomDocument; roomId: string }> = ({
           onReady={() => {
             const batch = writeBatch(store);
             const ref = roomActionsCollection(roomId);
-              batch.set(doc(ref), {
-                type: "INIT_POTS",
-                payload: {
-                  pots: [
-                    {
-                      id: "A",
-                    },
-                    {
-                      id: "B",
-                    },
-                    {
-                      id: "C",
-                    }
-                  ]
-                },
-                timestamp: new Date().getTime()
-              });
+            batch.set(doc(ref), {
+              type: "INIT_POTS",
+              payload: {
+                pots: [
+                  {
+                    id: "A",
+                  },
+                  {
+                    id: "B",
+                  },
+                  {
+                    id: "C",
+                  },
+                ],
+              },
+              timestamp: new Date().getTime(),
+            });
             batch.set(doc(roomCollection, roomId), {
               phase: "game",
             });

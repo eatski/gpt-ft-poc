@@ -6,7 +6,7 @@ import { personaSchema } from "./schema";
 export type PersonasDocument = z.infer<typeof personaSchema>;
 
 class ZodSchemaConverter<T> {
-  constructor(private schema: z.ZodSchema<T>) { }
+  constructor(private schema: z.ZodSchema<T>) {}
 
   toFirestore(data: T) {
     return data;
@@ -48,16 +48,19 @@ export const roomActionsDocumentSchema = z.union([
   z.object({
     type: z.literal("INIT_POTS"),
     payload: z.object({
-      pots: z.array(z.object({
-        id: z.string(),
-      }))
+      pots: z.array(
+        z.object({
+          id: z.string(),
+        }),
+      ),
     }),
     timestamp: z.number(),
-  }), z.object({
+  }),
+  z.object({
     type: z.literal("PUT_INGREDIENT"),
     payload: z.object({
       potId: z.string(),
-      ingredient: z.string()
+      ingredient: z.string(),
     }),
     timestamp: z.number(),
   }),
@@ -65,17 +68,17 @@ export const roomActionsDocumentSchema = z.union([
     type: z.literal("LOOK_INTO_POT"),
     payload: z.object({
       potId: z.string(),
-      imageUrl: z.string()
+      imageUrl: z.string(),
     }),
     timestamp: z.number(),
-  })
-])
+  }),
+]);
 
 export type RoomActionsDocument = z.infer<typeof roomActionsDocumentSchema>;
 
 export const roomActionsCollection = (roomId: string) =>
-   collection(db, `/rooms/${roomId}/actions`).withConverter<RoomActionsDocument>(
+  collection(db, `/rooms/${roomId}/actions`).withConverter<RoomActionsDocument>(
     new ZodSchemaConverter(roomActionsDocumentSchema),
   );
 
-export const roomActionsQueryBase = (roomId: string) => query(roomActionsCollection(roomId),orderBy("timestamp"));
+export const roomActionsQueryBase = (roomId: string) => query(roomActionsCollection(roomId), orderBy("timestamp"));
