@@ -55,49 +55,51 @@ const useTranslationActionsWord = (roomId: string) => {
     return onSnapshot(filtered, async (snapshot) => {
       const words = snapshot.docs.flatMap((doc) => {
         return match(doc.data())
-          .with({
-            type: "PUT_INGREDIENT",
-            payload: P.select(),
-          },(payload) => [payload.ingredient])
-          .exhaustive()
+          .with(
+            {
+              type: "PUT_INGREDIENT",
+              payload: P.select(),
+            },
+            (payload) => [payload.ingredient],
+          )
+          .exhaustive();
       });
-      if(!words.length){
-        return
+      if (!words.length) {
+        return;
       }
       const translationCollectionRef = translationCollection(roomId);
       const queryByWords = query(translationCollectionRef, where("ja", "in", words));
-      const notTranslated = await getDocs(queryByWords)
-        .then((snapshot) => {
-          const translations = snapshot.docs.map((doc) => doc.data());
-          return words.filter(e => !translations.some(t => t.ja.includes(e)))
-        })
-        const body: RequestBody = {
-          words: notTranslated
-        };
-      if(!notTranslated.length){
+      const notTranslated = await getDocs(queryByWords).then((snapshot) => {
+        const translations = snapshot.docs.map((doc) => doc.data());
+        return words.filter((e) => !translations.some((t) => t.ja.includes(e)));
+      });
+      const body: RequestBody = {
+        words: notTranslated,
+      };
+      if (!notTranslated.length) {
         return;
       }
       const translated = await fetch("/api/translate", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(body),
-        })
-        .then(res => res.json())
-        .then(json => responseBodySchema.parse(json));
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(body),
+      })
+        .then((res) => res.json())
+        .then((json) => responseBodySchema.parse(json));
 
-        const batch = writeBatch(store);
-        translated.forEach(e => {
-          batch.set(doc(translationCollectionRef,btoa(encodeURIComponent(e.original))), {
-            ja: e.original,
-            en: e.translated,
-          })
-        })
-       await  batch.commit();
-    })
-  },[roomId])
-}
+      const batch = writeBatch(store);
+      translated.forEach((e) => {
+        batch.set(doc(translationCollectionRef, btoa(encodeURIComponent(e.original))), {
+          ja: e.original,
+          en: e.translated,
+        });
+      });
+      await batch.commit();
+    });
+  }, [roomId]);
+};
 
 const Pot: React.FC<{ potId: string; roomId: string }> = ({ potId, roomId }) => {
   const [open, setOpen] = useState(false);
@@ -119,21 +121,23 @@ const Pot: React.FC<{ potId: string; roomId: string }> = ({ potId, roomId }) => 
   const lookIntoPot = async () => {
     const putIngredientActuibsQuery = brandFilterQuery(roomActionsCollection(roomId), "type", "PUT_INGREDIENT");
     const filteredByPotIdQuery = query(putIngredientActuibsQuery, where("payload.potId", "==", potId));
-    const ingredients = await getDocs(filteredByPotIdQuery).then((snapshot) => snapshot.docs.map((doc) => doc.data().payload.ingredient));
-    console.log(ingredients)
+    const ingredients = await getDocs(filteredByPotIdQuery).then((snapshot) =>
+      snapshot.docs.map((doc) => doc.data().payload.ingredient),
+    );
+    console.log(ingredients);
 
     const translationCollectionRef = translationCollection(roomId);
     const queryByWords = query(translationCollectionRef, where("ja", "in", ingredients));
-    const translations = await getDocs(queryByWords)
+    const translations = await getDocs(queryByWords);
 
     const body: ImagesRequestBody = {
       ingredients: translations.docs.map((doc) => doc.data().en),
     };
 
     const imageUrl = await fetch("/api/yaminabe/image", {
-        method: "POST",
-        body: JSON.stringify(body),
-      }).then((res) => res.text())
+      method: "POST",
+      body: JSON.stringify(body),
+    }).then((res) => res.text());
 
     await addDoc(roomActionsCollection(roomId), {
       type: "LOOK_INTO_POT",

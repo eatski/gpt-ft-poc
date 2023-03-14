@@ -2,12 +2,14 @@ import { openai } from "@/lib/openapi";
 import * as z from "zod";
 import zodToJsonSchema from "zod-to-json-schema";
 
-type Words = string[]
+type Words = string[];
 
-const zodSchema = z.array(z.object({
-  original: z.string(),
-  translated: z.string(),
-}));
+const zodSchema = z.array(
+  z.object({
+    original: z.string(),
+    translated: z.string(),
+  }),
+);
 
 type Translation = z.infer<typeof zodSchema>;
 
@@ -49,7 +51,7 @@ export const translateToEn = async (words: Words): Promise<Translation> => {
   try {
     return zodSchema.parse(JSON.parse(text));
   } catch (e) {
-    console.log("output",text)
+    console.log("output", text);
     console.error(e);
     throw new Error("Parser Error");
   }
