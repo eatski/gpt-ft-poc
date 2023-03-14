@@ -28,7 +28,7 @@ Only JSON according to the following schema
 
 ${JSON.stringify(jsonSchema)}
 
-# Output
+# Output JSON
 `;
 };
 
