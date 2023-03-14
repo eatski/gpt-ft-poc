@@ -8,7 +8,7 @@ const createPrompt = (ingredients: string[]) => {
 export const createFoodImage = async (ingredients: string[]): Promise<string> => {
   const res = await openai
     .createImage({
-      size: "1024x1024",
+      size: "256x256",
       prompt: createPrompt(ingredients),
       response_format: "url",
     })

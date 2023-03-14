@@ -1,15 +1,11 @@
-import { roomActionsCollection, RoomActionsDocument } from "@/models/store";
+import { RoomActionsDocument, roomActionsQueryBase } from "@/models/store";
 import { useSubscribeCollection } from "@/util/firestore-hooks";
-import { orderBy, query, QuerySnapshot } from "@firebase/firestore";
+import { QuerySnapshot } from "@firebase/firestore";
 import React, {useMemo} from "react";
 import { match, P } from 'ts-pattern';
 
 export const Log: React.FC<{roomId: string}> = ({roomId}) => {
-    const col = useMemo(() => 
-        query(roomActionsCollection(roomId),
-        orderBy("timestamp"),),
-    [roomId]
-    );
+    const col = useMemo(() => roomActionsQueryBase(roomId),[roomId])
     const ingredientsGroupSubscription = useSubscribeCollection(col);
     switch (ingredientsGroupSubscription.status) {
         case "error":
@@ -39,6 +35,13 @@ const Success = ({ data }: {data: QuerySnapshot<RoomActionsDocument>}) => {
                                 type: "PUT_INGREDIENT",
                                 payload: P.select()
                             }, (payload) => <p>{payload.ingredient}が鍋{payload.potId}に入りました。</p>)
+                            .with({
+                                type: "LOOK_INTO_POT",
+                                payload: P.select()
+                            },(payload) => <>
+                                <p>鍋{payload.potId}を見ました。</p>
+                                <img src={payload.imageUrl} />
+                            </>)
                             .exhaustive()
                     }
                     </li>  

@@ -1,4 +1,4 @@
-import { collection, QueryDocumentSnapshot, SnapshotOptions } from "@firebase/firestore";
+import { collection, orderBy, query, QueryDocumentSnapshot, SnapshotOptions } from "@firebase/firestore";
 import { z } from "zod";
 import { db } from "../lib/firestore";
 import { personaSchema } from "./schema";
@@ -60,12 +60,22 @@ export const roomActionsDocumentSchema = z.union([
       ingredient: z.string()
     }),
     timestamp: z.number(),
-  })]
-)
+  }),
+  z.object({
+    type: z.literal("LOOK_INTO_POT"),
+    payload: z.object({
+      potId: z.string(),
+      imageUrl: z.string()
+    }),
+    timestamp: z.number(),
+  })
+])
 
 export type RoomActionsDocument = z.infer<typeof roomActionsDocumentSchema>;
 
 export const roomActionsCollection = (roomId: string) =>
-  collection(db, `/rooms/${roomId}/actions`).withConverter<RoomActionsDocument>(
+   collection(db, `/rooms/${roomId}/actions`).withConverter<RoomActionsDocument>(
     new ZodSchemaConverter(roomActionsDocumentSchema),
   );
+
+export const roomActionsQueryBase = (roomId: string) => query(roomActionsCollection(roomId),orderBy("timestamp"));

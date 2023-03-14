@@ -1,7 +1,8 @@
 import { roomActionsCollection } from "@/models/store";
+import { RequestBody } from "@/pages/api/yaminabe/image";
 import { brandFilterQuery } from "@/util/brandedFilterQuery";
 import { useSubscribeCollection } from "@/util/firestore-hooks";
-import { addDoc } from "@firebase/firestore";
+import { addDoc, getDocs, query, where } from "@firebase/firestore";
 import React, { useMemo, useState } from "react";
 import { Log } from "./log";
 
@@ -46,7 +47,7 @@ export const Game: React.FC<GameProps> = ({ roomId }) => {
 const Pot: React.FC<{ potId: string,roomId: string }> = ({ potId,roomId }) => {
     const [open , setOpen] = useState(false);
     const [input, setInput] = useState("");
-    const onSubmit = () => {
+    const putIngredient = () => {
       const ref = roomActionsCollection(roomId);
       addDoc(ref,{
         type: "PUT_INGREDIENT",
@@ -59,14 +60,49 @@ const Pot: React.FC<{ potId: string,roomId: string }> = ({ potId,roomId }) => {
       setInput("")
       setOpen(false)
     }
+    const lookIntoPot = () => {
+      const putIngredientActuibsQuery = brandFilterQuery(roomActionsCollection(roomId),"type", "PUT_INGREDIENT");
+      const filteredByPotIdQuery = query(putIngredientActuibsQuery,where("payload.potId","==",potId));
+      getDocs(filteredByPotIdQuery)
+      .then(snapshot => {
+        const ingredients = snapshot.docs.map(doc => doc.data().payload.ingredient);
+        const body: RequestBody = {
+          ingredients
+        }
+        return fetch("/api/yaminabe/image",{
+          method: "POST",
+          body: JSON.stringify(body)
+        })
+      })
+      .then(res => res.text())
+      .then(url => {
+        return addDoc(roomActionsCollection(roomId),{
+          type: "LOOK_INTO_POT",
+          payload: {
+            potId,
+            imageUrl: url
+          },
+          timestamp: new Date().getTime()
+        })
+      })
+    }
     return <section>
         <h2>鍋: {potId}</h2>
         <button onClick={() => setOpen(!open)}>toggle</button>
         {open && 
-            <>
-                <input type="text" value={input} onChange={(e) => setInput(e.target.value)} />
-                {input && <button onClick={onSubmit}>鍋に入れる</button>}
-            </>
+            <fieldset>
+                <div>
+                  <label>
+                    鍋にモノを入れる
+                    <input type="text" value={input} onChange={(e) => setInput(e.target.value)} />
+                    {input && <button onClick={putIngredient}>鍋に入れる</button>}
+                  </label>
+                </div>
+                <div>
+                  <button onClick={lookIntoPot}>鍋の中を覗く</button>
+                </div>
+                
+            </fieldset>
         }
     </section>;
 }
