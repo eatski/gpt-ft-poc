@@ -1,6 +1,6 @@
 import { store } from "@/lib/firestore";
 import { roomActionsCollection, translationCollection } from "@/models/store";
-import { RequestBody, responseBodySchema } from "@/pages/api/translate";
+import { RequestBody, responseBodySchema } from "@/apiSchema/translate";
 import { RequestBody as ImagesRequestBody } from "@/pages/api/yaminabe/image";
 import { brandFilterQuery } from "@/util/brandedFilterQuery";
 import { useSubscribeCollection } from "@/util/firestore-hooks";
@@ -124,7 +124,6 @@ const Pot: React.FC<{ potId: string; roomId: string }> = ({ potId, roomId }) => 
     const ingredients = await getDocs(filteredByPotIdQuery).then((snapshot) =>
       snapshot.docs.map((doc) => doc.data().payload.ingredient),
     );
-    console.log(ingredients);
 
     const translationCollectionRef = translationCollection(roomId);
     const queryByWords = query(translationCollectionRef, where("ja", "in", ingredients));
