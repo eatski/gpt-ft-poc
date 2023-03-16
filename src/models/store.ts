@@ -9,7 +9,7 @@ class ZodSchemaConverter<T> {
   constructor(private schema: z.ZodSchema<T>) {}
 
   toFirestore(data: T) {
-    return data;
+    return this.schema.parse(data);
   }
 
   fromFirestore(snapshot: QueryDocumentSnapshot, options: SnapshotOptions) {
@@ -44,6 +44,11 @@ export const roomCollection = collection(db, `/rooms/`).withConverter<RoomDocume
   new ZodSchemaConverter(roomDocumentSchema),
 );
 
+export const translatableSchema = z.object({
+  original: z.string(),
+  translated: z.union([z.string(), z.undefined()]),
+})
+
 export const roomActionsDocumentSchema = z.union([
   z.object({
     type: z.literal("INIT_POTS"),
@@ -60,7 +65,7 @@ export const roomActionsDocumentSchema = z.union([
     type: z.literal("PUT_INGREDIENT"),
     payload: z.object({
       potId: z.string(),
-      ingredient: z.string(),
+      ingredient: translatableSchema,
     }),
     timestamp: z.number(),
   }),
@@ -82,15 +87,3 @@ export const roomActionsCollection = (roomId: string) =>
   );
 
 export const roomActionsQueryBase = (roomId: string) => query(roomActionsCollection(roomId), orderBy("timestamp"));
-
-export const translationDocumentSchema = z.object({
-  ja: z.string(),
-  en: z.string(),
-});
-
-export type TranslationDocument = z.infer<typeof translationDocumentSchema>;
-
-export const translationCollection = (roomId: string) =>
-  collection(db, `/rooms/${roomId}/translations`).withConverter<TranslationDocument>(
-    new ZodSchemaConverter(translationDocumentSchema),
-  );

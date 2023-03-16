@@ -1,13 +1,13 @@
 import { store } from "@/lib/firestore";
-import { roomActionsCollection, translationCollection } from "@/models/store";
+import { roomActionsCollection } from "@/models/store";
 import { RequestBody, responseBodySchema } from "@/apiSchema/translate";
 import { RequestBody as ImagesRequestBody } from "@/pages/api/yaminabe/image";
 import { brandFilterQuery } from "@/util/brandedFilterQuery";
 import { useSubscribeCollection } from "@/util/firestore-hooks";
-import { addDoc, doc, getDocs, onSnapshot, query, where, writeBatch } from "@firebase/firestore";
+import { addDoc, getDocs, onSnapshot, query, where, writeBatch } from "@firebase/firestore";
 import React, { useEffect, useMemo, useState } from "react";
-import { match, P } from "ts-pattern";
 import { Log } from "./log";
+import deepmerge from "deepmerge";
 
 export type GameProps = {
   roomId: string;
@@ -20,7 +20,7 @@ export const Game: React.FC<GameProps> = ({ roomId }) => {
   );
   const roomActions = useSubscribeCollection(roomActionsCollectionQuery);
 
-  useTranslationActionsWord(roomId);
+  useTranslationPutIngredient(roomId);
 
   switch (roomActions.status) {
     case "error":
@@ -48,37 +48,18 @@ export const Game: React.FC<GameProps> = ({ roomId }) => {
   }
 };
 
-const useTranslationActionsWord = (roomId: string) => {
+const useTranslationPutIngredient = (roomId: string) => {
   useEffect(() => {
     const roomActiionsCollectionRef = roomActionsCollection(roomId);
     const filtered = brandFilterQuery(roomActiionsCollectionRef, "type", "PUT_INGREDIENT");
     return onSnapshot(filtered, async (snapshot) => {
-      const words = snapshot.docs.flatMap((doc) => {
-        return match(doc.data())
-          .with(
-            {
-              type: "PUT_INGREDIENT",
-              payload: P.select(),
-            },
-            (payload) => [payload.ingredient],
-          )
-          .exhaustive();
-      });
-      if (!words.length) {
-        return;
-      }
-      const translationCollectionRef = translationCollection(roomId);
-      const queryByWords = query(translationCollectionRef, where("ja", "in", words));
-      const notTranslated = await getDocs(queryByWords).then((snapshot) => {
-        const translations = snapshot.docs.map((doc) => doc.data());
-        return words.filter((e) => !translations.some((t) => t.ja.includes(e)));
-      });
-      const body: RequestBody = {
-        words: notTranslated,
-      };
+      const notTranslated = snapshot.docs.filter((e) => !e.data().payload.ingredient.translated);
       if (!notTranslated.length) {
         return;
       }
+      const body: RequestBody = {
+        words: notTranslated.map(item => item.data().payload.ingredient.original),
+      };
       const translated = await fetch("/api/translate", {
         method: "POST",
         headers: {
@@ -90,11 +71,15 @@ const useTranslationActionsWord = (roomId: string) => {
         .then((json) => responseBodySchema.parse(json));
 
       const batch = writeBatch(store);
-      translated.forEach((e) => {
-        batch.set(doc(translationCollectionRef, btoa(encodeURIComponent(e.original))), {
-          ja: e.original,
-          en: e.translated,
-        });
+      notTranslated.forEach((doc) => {
+        const data = doc.data();
+        batch.update(doc.ref,deepmerge({
+          payload: {
+            ingredient: {
+              translated: translated.find(e => e.original === data.payload.ingredient.original)?.translated,
+            }
+          }
+        },data));
       });
       await batch.commit();
     });
@@ -111,7 +96,9 @@ const Pot: React.FC<{ potId: string; roomId: string }> = ({ potId, roomId }) => 
       type: "PUT_INGREDIENT",
       payload: {
         potId,
-        ingredient: input,
+        ingredient: {
+          original: input
+        },
       },
       timestamp: new Date().getTime(),
     });
@@ -125,12 +112,8 @@ const Pot: React.FC<{ potId: string; roomId: string }> = ({ potId, roomId }) => 
       snapshot.docs.map((doc) => doc.data().payload.ingredient),
     );
 
-    const translationCollectionRef = translationCollection(roomId);
-    const queryByWords = query(translationCollectionRef, where("ja", "in", ingredients));
-    const translations = await getDocs(queryByWords);
-
     const body: ImagesRequestBody = {
-      ingredients: translations.docs.map((doc) => doc.data().en),
+      ingredients: ingredients.map(e => e.translated || e.original), // TODO: 未翻訳の場合はエラーにする
     };
 
     const imageUrl = await fetch("/api/yaminabe/image", {

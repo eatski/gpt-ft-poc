@@ -42,7 +42,7 @@ const Success = ({ data }: { data: QuerySnapshot<RoomActionsDocument> }) => {
                   },
                   (payload) => (
                     <p>
-                      {payload.ingredient}が鍋{payload.potId}に入りました。
+                      {payload.ingredient.original}が鍋{payload.potId}に入りました。
                     </p>
                   ),
                 )
