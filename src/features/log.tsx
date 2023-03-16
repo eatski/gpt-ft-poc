@@ -3,6 +3,7 @@ import { useSubscribeCollection } from "@/util/firestore-hooks";
 import { QuerySnapshot } from "@firebase/firestore";
 import React, { useMemo } from "react";
 import { match, P } from "ts-pattern";
+import { separateActionsIntoTurn } from "./turn";
 
 export const Log: React.FC<{ roomId: string }> = ({ roomId }) => {
   const col = useMemo(() => roomActionsQueryBase(roomId), [roomId]);
@@ -20,47 +21,59 @@ export const Log: React.FC<{ roomId: string }> = ({ roomId }) => {
 };
 
 const Success = ({ data }: { data: QuerySnapshot<RoomActionsDocument> }) => {
+    const turns = separateActionsIntoTurn(data.docs.map(e => e.data()),{
+        playerNum: 1
+    })
   return (
     <section>
       <h2>ログ</h2>
       <ul>
-        {data.docs.map((e) => {
-          return (
-            <li key={e.id}>
-              {match(e.data())
-                .with(
-                  {
-                    type: "INIT_POTS",
-                    payload: P.select(),
-                  },
-                  (payload) => <p>鍋が{payload.pots.length}個あります。</p>,
-                )
-                .with(
-                  {
-                    type: "PUT_INGREDIENT",
-                    payload: P.select(),
-                  },
-                  (payload) => (
-                    <p>
-                      {payload.ingredient.original}が鍋{payload.potId}に入りました。
-                    </p>
-                  ),
-                )
-                .with(
-                  {
-                    type: "LOOK_INTO_POT",
-                    payload: P.select(),
-                  },
-                  (payload) => (
-                    <>
-                      <p>鍋{payload.potId}を見ました。</p>
-                      <img src={payload.imageUrl} />
-                    </>
-                  ),
-                )
-                .exhaustive()}
+        {turns.map((e,i) => {
+            return <li key={i}>
+                {i + 1}ターン目
+                <ul>
+                    {
+                        e.actions.map((e,i) => {
+                            return (
+                                <li key={i}>
+                                {match(e)
+                                    .with(
+                                    {
+                                        type: "INIT_POTS",
+                                        payload: P.select(),
+                                    },
+                                    (payload) => <p>鍋が{payload.pots.length}個あります。</p>,
+                                    )
+                                    .with(
+                                    {
+                                        type: "PUT_INGREDIENT",
+                                        payload: P.select(),
+                                    },
+                                    (payload) => (
+                                        <p>
+                                        {payload.ingredient.original}が鍋{payload.potId}に入りました。
+                                        </p>
+                                    ),
+                                    )
+                                    .with(
+                                    {
+                                        type: "LOOK_INTO_POT",
+                                        payload: P.select(),
+                                    },
+                                    (payload) => (
+                                        <>
+                                        <p>鍋{payload.potId}を見ました。</p>
+                                        <img src={payload.imageUrl} />
+                                        </>
+                                    ),
+                                    )
+                                    .exhaustive()}
+                                </li>
+                            );
+                        })
+                    }
+                </ul>
             </li>
-          );
         })}
       </ul>
     </section>

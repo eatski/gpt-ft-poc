@@ -4,7 +4,6 @@ import { addDoc, query, where, getDocs, onSnapshot, writeBatch } from "@firebase
 import React, { useEffect, useMemo, useState } from "react";
 import { RequestBody as ImagesRequestBody } from "@/pages/api/yaminabe/image";
 import { useSubscribeCollection } from "@/util/firestore-hooks";
-import { Log } from "./log";
 import { RequestBody, responseBodySchema } from "@/apiSchema/translate";
 import { store } from "@/lib/firestore";
 import deepmerge from "deepmerge";
@@ -41,7 +40,6 @@ export const Pots = ({ roomId }: PotsProps) => {
               );
             })}
           </ul>
-          <Log roomId={roomId} />
         </section>
       );
   }
