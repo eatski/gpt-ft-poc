@@ -4,8 +4,6 @@ import { translateToEn } from "@/usecases/openai/translateToEn";
 import type { NextApiRequest, NextApiResponse } from "next";
 import { z } from "zod";
 
-
-
 export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse<z.infer<typeof responseBodySchema> | string>,

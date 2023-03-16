@@ -7,8 +7,8 @@ export const requestBodySchema = z.object({
 export type RequestBody = z.infer<typeof requestBodySchema>;
 
 export const responseBodySchema = z.array(
-    z.object({
-      original: z.string(),
-      translated: z.string(),
-    }),
-  );
+  z.object({
+    original: z.string(),
+    translated: z.string(),
+  }),
+);

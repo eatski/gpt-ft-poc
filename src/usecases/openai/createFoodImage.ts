@@ -1,6 +1,6 @@
 // Next.js API route support: https://nextjs.org/docs/api-routes/introduction
 import { openai } from "@/lib/openapi";
-import {shuffle} from "lodash-es"
+import { shuffle } from "lodash-es";
 
 const createPrompt = (ingredients: string[]) => {
   return `Only ${ingredients.join(", ")} in a cooking pot.`;

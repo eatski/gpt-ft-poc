@@ -47,7 +47,7 @@ export const roomCollection = collection(db, `/rooms/`).withConverter<RoomDocume
 export const translatableSchema = z.object({
   original: z.string(),
   translated: z.union([z.string(), z.undefined()]),
-})
+});
 
 export const roomActionsDocumentSchema = z.union([
   z.object({
