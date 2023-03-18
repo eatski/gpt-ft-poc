@@ -13,4 +13,4 @@ const app = initializeApp({
 
 export const store = initializeFirestore(app, {});
 
-export const db = doc(store, "/yaminabe/v1");
+export const appNameSpace = doc(store, "/chatgpt-trpg/v1");
