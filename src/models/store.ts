@@ -15,7 +15,8 @@ export class ZodSchemaConverter<T> {
 }
 
 export const ROOM_SCHEMA = z.object({
-  createdAt: z.date()
+  createdAt: z.date(),
+  scenarioId: z.string(),
 });
 
 export const getRoomCollection = () => {
@@ -40,6 +41,8 @@ export const SCENARIO_SCHEMA = z.object({
   }),
   description: z.string(),
 })
+
+export type Scenario = z.infer<typeof SCENARIO_SCHEMA>;
 
 export const getScenarioCollection = () => {
   return collection(appNameSpace, "scenarios").withConverter(new ZodSchemaConverter(SCENARIO_SCHEMA));
