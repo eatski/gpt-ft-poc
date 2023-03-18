@@ -20,9 +20,13 @@ const CreateRoom = ({ scenarios }: Props) => {
     setStatus('loading'); // ボタンをクリックした時にloading状態にする
 
     try {
+      const scenario = scenarios.find((scenario) => scenario.id === selectedScenarioId);
+      if (!scenario) {
+        throw new Error('Scenario not found');
+      }
       const roomRef = await addDoc(getRoomCollection(), {
-        createdAt: new Date(),
-        scenarioId: selectedScenarioId,
+        createdAt: new Date().getTime(),
+        scenario: scenario.data,
       });
       router.push(`/rooms/${roomRef.id}`); // ルームページにリダイレクトする
     } catch (error) {

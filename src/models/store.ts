@@ -14,15 +14,6 @@ export class ZodSchemaConverter<T> {
   }
 }
 
-export const ROOM_SCHEMA = z.object({
-  createdAt: z.date(),
-  scenarioId: z.string(),
-});
-
-export const getRoomCollection = () => {
-  return collection(appNameSpace, "rooms").withConverter(new ZodSchemaConverter(ROOM_SCHEMA));
-}
-
 export const CHAT_MESSAGE_SCHEMA = z.object({
   text: z.string(),
   createdAt: z.number(),
@@ -46,5 +37,16 @@ export type Scenario = z.infer<typeof SCENARIO_SCHEMA>;
 
 export const getScenarioCollection = () => {
   return collection(appNameSpace, "scenarios").withConverter(new ZodSchemaConverter(SCENARIO_SCHEMA));
+}
+
+export const ROOM_SCHEMA = z.object({
+  createdAt: z.number(),
+  scenario: SCENARIO_SCHEMA,
+});
+
+export type Room = z.infer<typeof ROOM_SCHEMA>;
+
+export const getRoomCollection = () => {
+  return collection(appNameSpace, "rooms").withConverter(new ZodSchemaConverter(ROOM_SCHEMA));
 }
 
