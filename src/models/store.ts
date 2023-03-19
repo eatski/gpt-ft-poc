@@ -20,6 +20,8 @@ export const CHAT_MESSAGE_SCHEMA = z.object({
   author: z.union([z.literal("user"), z.literal("assistant")])
 })
 
+export type ChatMessage = z.infer<typeof CHAT_MESSAGE_SCHEMA>;
+
 export const getChatMessageCollection = (roomId: string) => {
   return collection(appNameSpace,`rooms/${roomId}/messages`).withConverter(new ZodSchemaConverter(CHAT_MESSAGE_SCHEMA));
 }

@@ -1,15 +1,17 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import { useSubscribeDocument } from '@/util/firestore-hooks';
 import { getRoomCollection } from '@/models/store';
 import { doc } from '@firebase/firestore';
 import { GetServerSideProps, GetServerSidePropsContext } from 'next';
+import { Chat } from '@/feature/chat';
 
 type Props = {
   roomId: string;
 };
 
 const RoomPage = ({ roomId }: Props) => {
-  const room = useSubscribeDocument(doc(getRoomCollection(),roomId));
+  const memorizedGetRoomCollection = useMemo(() => doc(getRoomCollection(),roomId),[roomId]);
+  const room = useSubscribeDocument(memorizedGetRoomCollection);
 
   switch (room.status) {
     case 'loading':
@@ -22,6 +24,7 @@ const RoomPage = ({ roomId }: Props) => {
         <div>
           <h1>{room.data.scenario.title}</h1>
           <p>{room.data.createdAt.toString()}</p>
+          <Chat roomId={roomId} scenario={room.data.scenario} />
         </div>
       );
   }

@@ -66,8 +66,10 @@ const CreateRoom = ({ scenarios }: Props) => {
     </div>
   );
 };
+const scenarioCollection = getScenarioCollection()
+
 const CreateRoomPage = () => {
-  const scenarios = useSubscribeCollection(getScenarioCollection());
+  const scenarios = useSubscribeCollection(scenarioCollection);
 
   switch (scenarios.status) {
     case 'loading':

@@ -52,7 +52,8 @@ export const useSubscribeCollection = <T>(collectionRef: Query<T>) => {
           data: snapshot,
         });
       },
-      () => {
+      (e) => {
+        console.error(e)
         setCollection({
           status: "error",
         });
