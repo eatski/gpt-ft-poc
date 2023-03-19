@@ -17,14 +17,16 @@ export class ZodSchemaConverter<T> {
 export const CHAT_MESSAGE_SCHEMA = z.object({
   text: z.string(),
   createdAt: z.number(),
-  author: z.union([z.literal("user"), z.literal("assistant")])
-})
+  author: z.union([z.literal("user"), z.literal("assistant")]),
+});
 
 export type ChatMessage = z.infer<typeof CHAT_MESSAGE_SCHEMA>;
 
 export const getChatMessageCollection = (roomId: string) => {
-  return collection(appNameSpace,`rooms/${roomId}/messages`).withConverter(new ZodSchemaConverter(CHAT_MESSAGE_SCHEMA));
-}
+  return collection(appNameSpace, `rooms/${roomId}/messages`).withConverter(
+    new ZodSchemaConverter(CHAT_MESSAGE_SCHEMA),
+  );
+};
 
 export const SCENARIO_SCHEMA = z.object({
   title: z.string(),
@@ -33,13 +35,13 @@ export const SCENARIO_SCHEMA = z.object({
     hidden: z.boolean(),
   }),
   description: z.string(),
-})
+});
 
 export type Scenario = z.infer<typeof SCENARIO_SCHEMA>;
 
 export const getScenarioCollection = () => {
   return collection(appNameSpace, "scenarios").withConverter(new ZodSchemaConverter(SCENARIO_SCHEMA));
-}
+};
 
 export const ROOM_SCHEMA = z.object({
   createdAt: z.number(),
@@ -50,5 +52,4 @@ export type Room = z.infer<typeof ROOM_SCHEMA>;
 
 export const getRoomCollection = () => {
   return collection(appNameSpace, "rooms").withConverter(new ZodSchemaConverter(ROOM_SCHEMA));
-}
-
+};

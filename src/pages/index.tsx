@@ -1,8 +1,8 @@
-import React, { useState } from 'react';
-import { useRouter } from 'next/router';
-import { getRoomCollection, getScenarioCollection, Scenario } from '@/models/store';
-import { addDoc } from '@firebase/firestore';
-import { useSubscribeCollection } from '@/util/firestore-hooks';
+import React, { useState } from "react";
+import { useRouter } from "next/router";
+import { getRoomCollection, getScenarioCollection, Scenario } from "@/models/store";
+import { addDoc } from "@firebase/firestore";
+import { useSubscribeCollection } from "@/util/firestore-hooks";
 
 type Props = {
   scenarios: {
@@ -13,16 +13,16 @@ type Props = {
 
 const CreateRoom = ({ scenarios }: Props) => {
   const router = useRouter();
-  const [status, setStatus] = useState<'idle' | 'loading' | 'error'>('idle');
-  const [selectedScenarioId, setSelectedScenarioId] = useState<string>('');
+  const [status, setStatus] = useState<"idle" | "loading" | "error">("idle");
+  const [selectedScenarioId, setSelectedScenarioId] = useState<string>("");
 
   const handleCreateRoom = async () => {
-    setStatus('loading'); // ボタンをクリックした時にloading状態にする
+    setStatus("loading"); // ボタンをクリックした時にloading状態にする
 
     try {
       const scenario = scenarios.find((scenario) => scenario.id === selectedScenarioId);
       if (!scenario) {
-        throw new Error('Scenario not found');
+        throw new Error("Scenario not found");
       }
       const roomRef = await addDoc(getRoomCollection(), {
         createdAt: new Date().getTime(),
@@ -30,8 +30,8 @@ const CreateRoom = ({ scenarios }: Props) => {
       });
       router.push(`/rooms/${roomRef.id}`); // ルームページにリダイレクトする
     } catch (error) {
-      setStatus('error'); // エラーが発生したら、エラーメッセージを表示する
-      console.error('Error adding document: ', error);
+      setStatus("error"); // エラーが発生したら、エラーメッセージを表示する
+      console.error("Error adding document: ", error);
     }
   };
 
@@ -41,12 +41,12 @@ const CreateRoom = ({ scenarios }: Props) => {
 
   const renderButtonContent = () => {
     switch (status) {
-      case 'loading':
-        return 'Loading...';
-      case 'error':
-        return 'Error creating room';
+      case "loading":
+        return "Loading...";
+      case "error":
+        return "Error creating room";
       default:
-        return 'Create Room';
+        return "Create Room";
     }
   };
 
@@ -60,23 +60,23 @@ const CreateRoom = ({ scenarios }: Props) => {
           </option>
         ))}
       </select>
-      <button onClick={handleCreateRoom} disabled={status === 'loading' || !selectedScenarioId}>
+      <button onClick={handleCreateRoom} disabled={status === "loading" || !selectedScenarioId}>
         {renderButtonContent()}
       </button>
     </div>
   );
 };
-const scenarioCollection = getScenarioCollection()
+const scenarioCollection = getScenarioCollection();
 
 const CreateRoomPage = () => {
   const scenarios = useSubscribeCollection(scenarioCollection);
 
   switch (scenarios.status) {
-    case 'loading':
+    case "loading":
       return <p>Loading...</p>;
-    case 'error':
+    case "error":
       return <p>Error occurred.</p>;
-    case 'not-found':
+    case "not-found":
       return <p>Not found.</p>;
     default:
       // eslint-disable-next-line no-case-declarations

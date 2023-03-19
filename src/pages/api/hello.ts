@@ -10,21 +10,23 @@ export default function handler(_: never, res: NextApiResponse<unknown>) {
         {
           role: "user",
           content: "I am a student.",
-          name: "Taro"
+          name: "Taro",
         },
         {
           role: "user",
           content: "I am Taro's teacher.",
-          name: "Yamada"
+          name: "Yamada",
         },
         {
           role: "user",
           content: "Who's Taro's teacher?",
-        }
-      ]
-    }).then(e => {
-      res.json(e.data)
-    }).catch(e => {
-      res.json(e.response.data)
+        },
+      ],
     })
+    .then((e) => {
+      res.json(e.data);
+    })
+    .catch((e) => {
+      res.json(e.response.data);
+    });
 }

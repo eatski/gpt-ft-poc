@@ -53,7 +53,7 @@ export const useSubscribeCollection = <T>(collectionRef: Query<T>) => {
         });
       },
       (e) => {
-        console.error(e)
+        console.error(e);
         setCollection({
           status: "error",
         });

@@ -1,23 +1,23 @@
-import React, { useMemo } from 'react';
-import { useSubscribeDocument } from '@/util/firestore-hooks';
-import { getRoomCollection } from '@/models/store';
-import { doc } from '@firebase/firestore';
-import { GetServerSideProps, GetServerSidePropsContext } from 'next';
-import { Chat } from '@/feature/chat';
+import React, { useMemo } from "react";
+import { useSubscribeDocument } from "@/util/firestore-hooks";
+import { getRoomCollection } from "@/models/store";
+import { doc } from "@firebase/firestore";
+import { GetServerSideProps, GetServerSidePropsContext } from "next";
+import { Chat } from "@/feature/chat";
 
 type Props = {
   roomId: string;
 };
 
 const RoomPage = ({ roomId }: Props) => {
-  const memorizedGetRoomCollection = useMemo(() => doc(getRoomCollection(),roomId),[roomId]);
+  const memorizedGetRoomCollection = useMemo(() => doc(getRoomCollection(), roomId), [roomId]);
   const room = useSubscribeDocument(memorizedGetRoomCollection);
 
   switch (room.status) {
-    case 'loading':
+    case "loading":
       return <p>Loading...</p>;
-    case 'error':
-    case 'not-found':
+    case "error":
+    case "not-found":
       return <p>Error occurred.</p>;
     default:
       return (
@@ -30,9 +30,7 @@ const RoomPage = ({ roomId }: Props) => {
   }
 };
 
-export const getServerSideProps: GetServerSideProps<Props> = async (
-  context: GetServerSidePropsContext,
-) => {
+export const getServerSideProps: GetServerSideProps<Props> = async (context: GetServerSidePropsContext) => {
   const roomId = context.params?.roomId as string;
 
   if (!roomId) {
